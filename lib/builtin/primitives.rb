@@ -208,3 +208,6 @@ define('append') do |list1, list1|
   List.new(list1+list2)
 end
 
+define('null?') do |list|
+  list.empty?
+end
