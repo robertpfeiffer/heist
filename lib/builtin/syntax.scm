@@ -153,3 +153,21 @@
               (set! forced #t)
               memo))))]))
 
+;----------------------------------------------------------------
+
+; Quasiquote
+
+; (quasiquote) constructs an expression from a template. The 
+; template is not evaluated. The values of unquoted subexpressions
+; are substituted into the template.
+
+(define-syntax quasiquote
+  (syntax-rules (unquote unquote-splicing)
+    [(_ ((unquote-splicing expr) rest ...))
+     (append expr (quasiquote (rest ...)))]
+    [(_ (unquote expr))
+     expr]
+    [(_ (expr rest ...))
+     (cons (quasiquote expr) (quasiquote (rest ...)))]
+    [(_ expr)
+     (quote expr)]))
