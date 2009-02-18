@@ -188,3 +188,23 @@ define('integer?') do |value|
   Integer === value
 end
 
+#----------------------------------------------------------------
+
+# List-processing functions
+
+define('cons') do |car, cdr|
+  List.new([car] + cdr)
+end
+
+define('car') do |list|
+  list.first
+end
+
+define('cdr') do |list|
+  List.new(list).rest
+end
+
+define('append') do |list1, list1|
+  List.new(list1+list2)
+end
+
