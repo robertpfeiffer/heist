@@ -61,7 +61,40 @@ end
 # quotes all items in the list recursively.
 syntax('quote') do |scope, arg|
   case arg
-  when List then arg.map { |cell| call('quote', scope, cell) }
+  when List then
+    arg.inject(List.new) do |list, cell|
+      list << call('quote', scope, cell)
+      list
+    end
+  when Identifier then arg.to_s.to_sym
+  else arg
+  end
+end
+
+# (quasiquote) is similar to (quote), except that when it
+# encounters an (unquote) or (unquote-splicing) expression
+# it will evaluate it and insert the result into the
+# surrounding quoted list.
+syntax('quasiquote') do |scope, arg|
+  case arg
+  when List then
+    result = List.new
+    arg.each do |cell|
+      if List === cell
+        case cell.first.to_s
+        when 'unquote' then
+          result << Heist.evaluate(cell.last, scope)
+        when 'unquote-splicing' then
+          list = Heist.evaluate(cell.last, scope)
+          list.each { |value| result << value }
+        else
+          result << call('quasiquote', scope, cell)
+        end
+      else
+        result << call('quasiquote', scope, cell)
+      end
+    end
+    result
   when Identifier then arg.to_s.to_sym
   else arg
   end
